@@ -2,44 +2,44 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.OBJLoader = function ( manager ) {
+import * as THREE from 'three'
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+export default class OBJLoader {
 
-	this.materials = null;
+	constructor(manager ) {
 
-	this.regexp = {
-		// v float float float
-		vertex_pattern           : /^v\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)/,
-		// vn float float float
-		normal_pattern           : /^vn\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)/,
-		// vt float float
-		uv_pattern               : /^vt\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)/,
-		// f vertex vertex vertex
-		face_vertex              : /^f\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)(?:\s+(-?\d+))?/,
-		// f vertex/uv vertex/uv vertex/uv
-		face_vertex_uv           : /^f\s+(-?\d+)\/(-?\d+)\s+(-?\d+)\/(-?\d+)\s+(-?\d+)\/(-?\d+)(?:\s+(-?\d+)\/(-?\d+))?/,
-		// f vertex/uv/normal vertex/uv/normal vertex/uv/normal
-		face_vertex_uv_normal    : /^f\s+(-?\d+)\/(-?\d+)\/(-?\d+)\s+(-?\d+)\/(-?\d+)\/(-?\d+)\s+(-?\d+)\/(-?\d+)\/(-?\d+)(?:\s+(-?\d+)\/(-?\d+)\/(-?\d+))?/,
-		// f vertex//normal vertex//normal vertex//normal
-		face_vertex_normal       : /^f\s+(-?\d+)\/\/(-?\d+)\s+(-?\d+)\/\/(-?\d+)\s+(-?\d+)\/\/(-?\d+)(?:\s+(-?\d+)\/\/(-?\d+))?/,
-		// o object_name | g group_name
-		object_pattern           : /^[og]\s*(.+)?/,
-		// s boolean
-		smoothing_pattern        : /^s\s+(\d+|on|off)/,
-		// mtllib file_reference
-		material_library_pattern : /^mtllib /,
-		// usemtl material_name
-		material_use_pattern     : /^usemtl /
-	};
-
-};
-
-THREE.OBJLoader.prototype = {
-
-	constructor: THREE.OBJLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	
+		this.materials = null;
+	
+		this.regexp = {
+			// v float float float
+			vertex_pattern           : /^v\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)/,
+			// vn float float float
+			normal_pattern           : /^vn\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)/,
+			// vt float float
+			uv_pattern               : /^vt\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)/,
+			// f vertex vertex vertex
+			face_vertex              : /^f\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)(?:\s+(-?\d+))?/,
+			// f vertex/uv vertex/uv vertex/uv
+			face_vertex_uv           : /^f\s+(-?\d+)\/(-?\d+)\s+(-?\d+)\/(-?\d+)\s+(-?\d+)\/(-?\d+)(?:\s+(-?\d+)\/(-?\d+))?/,
+			// f vertex/uv/normal vertex/uv/normal vertex/uv/normal
+			face_vertex_uv_normal    : /^f\s+(-?\d+)\/(-?\d+)\/(-?\d+)\s+(-?\d+)\/(-?\d+)\/(-?\d+)\s+(-?\d+)\/(-?\d+)\/(-?\d+)(?:\s+(-?\d+)\/(-?\d+)\/(-?\d+))?/,
+			// f vertex//normal vertex//normal vertex//normal
+			face_vertex_normal       : /^f\s+(-?\d+)\/\/(-?\d+)\s+(-?\d+)\/\/(-?\d+)\s+(-?\d+)\/\/(-?\d+)(?:\s+(-?\d+)\/\/(-?\d+))?/,
+			// o object_name | g group_name
+			object_pattern           : /^[og]\s*(.+)?/,
+			// s boolean
+			smoothing_pattern        : /^s\s+(\d+|on|off)/,
+			// mtllib file_reference
+			material_library_pattern : /^mtllib /,
+			// usemtl material_name
+			material_use_pattern     : /^usemtl /
+		};
+	
+	}
+	
+	load( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
@@ -51,21 +51,21 @@ THREE.OBJLoader.prototype = {
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	setPath: function ( value ) {
+	setPath( value ) {
 
 		this.path = value;
 
-	},
+	}
 
-	setMaterials: function ( materials ) {
+	setMaterials( materials ) {
 
 		this.materials = materials;
 
-	},
+	}
 
-	_createParserState : function () {
+	_createParserState () {
 
 		var state = {
 			objects  : [],
@@ -77,7 +77,7 @@ THREE.OBJLoader.prototype = {
 
 			materialLibraries : [],
 
-			startObject: function ( name, fromDeclaration ) {
+			startObject( name, fromDeclaration ) {
 
 				// If the current object (initial from reset) is not from a g/o declaration in the parsed
 				// file. We need to use it for the first parsed g/o to keep things in sync.
@@ -228,28 +228,28 @@ THREE.OBJLoader.prototype = {
 
 			},
 
-			parseVertexIndex: function ( value, len ) {
+			parseVertexIndex( value, len ) {
 
 				var index = parseInt( value, 10 );
 				return ( index >= 0 ? index - 1 : index + len / 3 ) * 3;
 
 			},
 
-			parseNormalIndex: function ( value, len ) {
+			parseNormalIndex( value, len ) {
 
 				var index = parseInt( value, 10 );
 				return ( index >= 0 ? index - 1 : index + len / 3 ) * 3;
 
 			},
 
-			parseUVIndex: function ( value, len ) {
+			parseUVIndex( value, len ) {
 
 				var index = parseInt( value, 10 );
 				return ( index >= 0 ? index - 1 : index + len / 2 ) * 2;
 
 			},
 
-			addVertex: function ( a, b, c ) {
+			addVertex( a, b, c ) {
 
 				var src = this.vertices;
 				var dst = this.object.geometry.vertices;
@@ -266,7 +266,7 @@ THREE.OBJLoader.prototype = {
 
 			},
 
-			addVertexLine: function ( a ) {
+			addVertexLine( a ) {
 
 				var src = this.vertices;
 				var dst = this.object.geometry.vertices;
@@ -277,7 +277,7 @@ THREE.OBJLoader.prototype = {
 
 			},
 
-			addNormal : function ( a, b, c ) {
+			addNormal ( a, b, c ) {
 
 				var src = this.normals;
 				var dst = this.object.geometry.normals;
@@ -294,7 +294,7 @@ THREE.OBJLoader.prototype = {
 
 			},
 
-			addUV: function ( a, b, c ) {
+			addUV( a, b, c ) {
 
 				var src = this.uvs;
 				var dst = this.object.geometry.uvs;
@@ -308,7 +308,7 @@ THREE.OBJLoader.prototype = {
 
 			},
 
-			addUVLine: function ( a ) {
+			addUVLine( a ) {
 
 				var src = this.uvs;
 				var dst = this.object.geometry.uvs;
@@ -318,7 +318,7 @@ THREE.OBJLoader.prototype = {
 
 			},
 
-			addFace: function ( a, b, c, d, ua, ub, uc, ud, na, nb, nc, nd ) {
+			addFace( a, b, c, d, ua, ub, uc, ud, na, nb, nc, nd ) {
 
 				var vLen = this.vertices.length;
 
@@ -389,7 +389,7 @@ THREE.OBJLoader.prototype = {
 
 			},
 
-			addLineGeometry: function ( vertices, uvs ) {
+			addLineGeometry( vertices, uvs ) {
 
 				this.object.geometry.type = 'Line';
 
@@ -416,9 +416,9 @@ THREE.OBJLoader.prototype = {
 
 		return state;
 
-	},
+	}
 
-	parse: function ( text ) {
+	parse( text ) {
 
 		console.time( 'OBJLoader' );
 
