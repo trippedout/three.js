@@ -2,17 +2,14 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.ColladaLoader = function ( manager ) {
+import * as THREE from 'three';
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+export default class ColladaLoader {
+	constructor( manager ) {
+		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	}
 
-};
-
-THREE.ColladaLoader.prototype = {
-
-	constructor: THREE.ColladaLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		function getBaseUrl( url ) {
 
@@ -31,25 +28,25 @@ THREE.ColladaLoader.prototype = {
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	options: {
+	// options: {
+    //
+	// 	set convertUpAxis ( value ) {
+    //
+	// 		console.log( 'ColladaLoder.options.convertUpAxis: TODO' );
+    //
+	// 	}
+    //
+	// }
 
-		set convertUpAxis ( value ) {
-
-			console.log( 'ColladaLoder.options.convertUpAxis: TODO' );
-
-		}
-
-	},
-
-	setCrossOrigin: function ( value ) {
+	setCrossOrigin( value ) {
 
 		this.crossOrigin = value;
 
-	},
+	}
 
-	parse: function ( text, baseUrl ) {
+	parse( text, baseUrl ) {
 
 		function getElementsByTagName( xml, name ) {
 
