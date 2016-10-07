@@ -2,15 +2,15 @@
  * Loads a Wavefront .mtl file specifying materials
  *
  * @author angelxuanchang
+ * @author trippedout
  */
 
-THREE.MTLLoader = function( manager ) {
+import * as THREE from 'three'
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
-
-};
-
-Object.assign( THREE.MTLLoader.prototype, THREE.EventDispatcher.prototype, {
+export default class MTLLoader {
+	constructor( manager ) {
+		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	}
 
 	/**
 	 * Loads and parses a MTL asset from a URL.
@@ -25,19 +25,16 @@ Object.assign( THREE.MTLLoader.prototype, THREE.EventDispatcher.prototype, {
 	 * @note In order for relative texture references to resolve correctly
 	 * you must call setPath and/or setTexturePath explicitly prior to load.
 	 */
-	load: function ( url, onLoad, onProgress, onError ) {
-
-		var scope = this;
-
-		var loader = new THREE.XHRLoader( this.manager );
+	load( url, onLoad, onProgress, onError ) {
+		let loader = new THREE.XHRLoader( this.manager );
 		loader.setPath( this.path );
-		loader.load( url, function ( text ) {
-
-			onLoad( scope.parse( text ) );
-
-		}, onProgress, onError );
-
-	},
+		loader.load(
+			url,
+			text => {
+				onLoad( this.parse( text ) );
+			},
+			onProgress, onError );
+	}
 
 	/**
 	 * Set base path for resolving references.
@@ -50,11 +47,11 @@ Object.assign( THREE.MTLLoader.prototype, THREE.EventDispatcher.prototype, {
 	 *     mtlLoader.setPath( 'assets/obj/' );
 	 *     mtlLoader.load( 'my.mtl', ... );
 	 */
-	setPath: function ( path ) {
+	setPath( path ) {
 
 		this.path = path;
-
-	},
+		
+	}
 
 	/**
 	 * Set base path for resolving texture references.
@@ -69,31 +66,31 @@ Object.assign( THREE.MTLLoader.prototype, THREE.EventDispatcher.prototype, {
 	 *     mtlLoader.setTexturePath( 'assets/textures/' );
 	 *     mtlLoader.load( 'my.mtl', ... );
 	 */
-	setTexturePath: function( path ) {
+	setTexturePath( path ) {
 
 		this.texturePath = path;
 
-	},
+	}
 
-	setBaseUrl: function( path ) {
+	setBaseUrl( path ) {
 
 		console.warn( 'THREE.MTLLoader: .setBaseUrl() is deprecated. Use .setTexturePath( path ) for texture path or .setPath( path ) for general base path instead.' );
 
 		this.setTexturePath( path );
 
-	},
+	}
 
-	setCrossOrigin: function ( value ) {
+	setCrossOrigin( value ) {
 
 		this.crossOrigin = value;
 
-	},
+	}
 
-	setMaterialOptions: function ( value ) {
+	setMaterialOptions( value ) {
 
 		this.materialOptions = value;
 
-	},
+	}
 
 	/**
 	 * Parses a MTL file.
@@ -106,7 +103,7 @@ Object.assign( THREE.MTLLoader.prototype, THREE.EventDispatcher.prototype, {
 	 * @note In order for relative texture references to resolve correctly
 	 * you must call setPath and/or setTexturePath explicitly prior to parse.
 	 */
-	parse: function ( text ) {
+	parse( text ) {
 
 		var lines = text.split( '\n' );
 		var info = {};
@@ -157,7 +154,7 @@ Object.assign( THREE.MTLLoader.prototype, THREE.EventDispatcher.prototype, {
 
 		}
 
-		var materialCreator = new THREE.MTLLoader.MaterialCreator( this.texturePath || this.path, this.materialOptions );
+		var materialCreator = new MTLLoader.MaterialCreator( this.texturePath || this.path, this.materialOptions );
 		materialCreator.setCrossOrigin( this.crossOrigin );
 		materialCreator.setManager( this.manager );
 		materialCreator.setMaterials( materialsInfo );
@@ -165,7 +162,7 @@ Object.assign( THREE.MTLLoader.prototype, THREE.EventDispatcher.prototype, {
 
 	}
 
-} );
+}
 
 /**
  * Create a new THREE-MTLLoader.MaterialCreator
@@ -182,46 +179,42 @@ Object.assign( THREE.MTLLoader.prototype, THREE.EventDispatcher.prototype, {
  * @constructor
  */
 
-THREE.MTLLoader.MaterialCreator = function( baseUrl, options ) {
+MTLLoader.MaterialCreator = class{
+	constructor( baseUrl, options ) {
+		this.baseUrl = baseUrl || '';
+		this.options = options;
+		this.materialsInfo = {};
+		this.materials = {};
+		this.materialsArray = [];
+		this.nameLookup = {};
 
-	this.baseUrl = baseUrl || '';
-	this.options = options;
-	this.materialsInfo = {};
-	this.materials = {};
-	this.materialsArray = [];
-	this.nameLookup = {};
+		this.side = ( this.options && this.options.side ) ? this.options.side : THREE.FrontSide;
+		this.wrap = ( this.options && this.options.wrap ) ? this.options.wrap : THREE.RepeatWrapping;
 
-	this.side = ( this.options && this.options.side ) ? this.options.side : THREE.FrontSide;
-	this.wrap = ( this.options && this.options.wrap ) ? this.options.wrap : THREE.RepeatWrapping;
+	}
 
-};
-
-THREE.MTLLoader.MaterialCreator.prototype = {
-
-	constructor: THREE.MTLLoader.MaterialCreator,
-
-	setCrossOrigin: function ( value ) {
+	setCrossOrigin( value ) {
 
 		this.crossOrigin = value;
 
-	},
+	}
 
-	setManager: function ( value ) {
+	setManager( value ) {
 
 		this.manager = value;
 
-	},
+	}
 
-	setMaterials: function( materialsInfo ) {
+	setMaterials( materialsInfo ) {
 
 		this.materialsInfo = this.convert( materialsInfo );
 		this.materials = {};
 		this.materialsArray = [];
 		this.nameLookup = {};
 
-	},
+	}
 
-	convert: function( materialsInfo ) {
+	convert( materialsInfo ) {
 
 		if ( ! this.options ) return materialsInfo;
 
@@ -288,9 +281,9 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 		return converted;
 
-	},
+	}
 
-	preload: function () {
+	preload() {
 
 		for ( var mn in this.materialsInfo ) {
 
@@ -298,15 +291,15 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 		}
 
-	},
+	}
 
-	getIndex: function( materialName ) {
+	getIndex( materialName ) {
 
 		return this.nameLookup[ materialName ];
 
-	},
+	}
 
-	getAsArray: function() {
+	getAsArray() {
 
 		var index = 0;
 
@@ -320,9 +313,9 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 		return this.materialsArray;
 
-	},
+	}
 
-	create: function ( materialName ) {
+	create( materialName ) {
 
 		if ( this.materials[ materialName ] === undefined ) {
 
@@ -332,9 +325,9 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 		return this.materials[ materialName ];
 
-	},
+	}
 
-	createMaterial_: function ( materialName ) {
+	createMaterial_( materialName ) {
 
 		// Create material
 
@@ -466,9 +459,9 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 		this.materials[ materialName ] = new THREE.MeshPhongMaterial( params );
 		return this.materials[ materialName ];
-	},
+	}
 
-	getTextureParams: function( value, matParams ) {
+	getTextureParams( value, matParams ) {
 
 		var texParams = {
 
@@ -507,9 +500,9 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 		texParams.url = items.join(' ').trim();
 		return texParams;
 
-	},
+	}
 
-	loadTexture: function ( url, mapping, onLoad, onProgress, onError ) {
+	loadTexture( url, mapping, onLoad, onProgress, onError ) {
 
 		var texture;
 		var loader = THREE.Loader.Handlers.get( url );
